@@ -24,8 +24,12 @@ class BreakoutGame:
         self.screen.onkeypress(self.paddle.go_left, "Left")
         self.screen.onkeypress(self.paddle.go_right, "Right")
 
+        self.start_level()
         self.game_loop()
         self.screen.exitonclick()
+
+    def start_level(self):
+        self.brick_manager.create_bricks(self.scoreboard.level)
 
     def game_loop(self):
         if not self.game_over:
@@ -34,7 +38,6 @@ class BreakoutGame:
             # Detect collision with walls
             if self.ball.xcor() > 290 or self.ball.xcor() < -290:
                 self.ball.bounce_x()
-
             if self.ball.ycor() > 290:
                 self.ball.bounce_y()
 
@@ -66,6 +69,12 @@ class BreakoutGame:
                     self.game_over = True
                 else:
                     self.ball.reset_position()
+
+            # Check if all bricks are cleared
+            if not self.brick_manager.bricks:
+                self.scoreboard.increase_level()
+                self.start_level()
+                self.ball.reset_position()
 
             self.screen.update()
             self.screen.ontimer(self.game_loop, 20)

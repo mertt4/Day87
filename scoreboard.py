@@ -6,6 +6,7 @@ class Scoreboard(Turtle):
         super().__init__()
         self.score = 0
         self.lives = 3
+        self.level = 1
         self.color('white')
         self.penup()
         self.hideturtle()
@@ -22,6 +23,10 @@ class Scoreboard(Turtle):
 
     def decrease_life(self):
         self.lives -= 1
+        self.update_score()
+
+    def increase_level(self):
+        self.level += 1
         self.update_score()
 
     def game_over(self):
