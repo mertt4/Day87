@@ -53,11 +53,8 @@ class BreakoutGame:
                 # Detect collision with paddle
                 if ((self.paddle.ycor() - 10 < self.ball.ycor() < self.paddle.ycor() + 10) and
                         (self.paddle.xcor() - 55 < self.ball.xcor() < self.paddle.xcor() + 55)):
-                    print(
-                        f"Paddle collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), Paddle at "
-                        f"({self.paddle.xcor()}, {self.paddle.ycor()})")
                     self.ball.sety(self.paddle.ycor() + 10)  # Adjust ball's position to avoid multiple collision detections
-                    self.ball.bounce_y()
+                    self.ball.paddle_bounce(self.paddle)
 
                 # Detect collision with bricks
                 for brick in self.brick_manager.bricks:
@@ -82,6 +79,7 @@ class BreakoutGame:
                 # Check if all bricks are cleared
                 if not self.brick_manager.bricks:
                     self.scoreboard.increase_level()
+                    self.ball.increase_speed()  # Increase ball speed when leveling up
                     self.start_level()
                     self.ball.reset_position()
 
