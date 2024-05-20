@@ -10,9 +10,11 @@ class BrickManager:
         colors = ['red', 'orange', 'yellow', 'green', 'blue']
         y_positions = [250, 220, 190, 160, 130]
 
-        if level == 1:
+        level_pattern = level % 3  # Cycle through 3 levels
+
+        if level_pattern == 1:
             brick_layout = [[1] * 10] * 5  # Simple grid for level 1
-        elif level == 2:
+        elif level_pattern == 2:
             brick_layout = [[1 if (i + j) % 2 == 0 else 0 for i in range(10)] for j in
                             range(5)]  # Checker pattern for level 2
         else:
