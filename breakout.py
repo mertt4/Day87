@@ -25,9 +25,21 @@ class BreakoutGame:
         self.screen.onkeypress(self.paddle.go_right, "Right")
         self.screen.onkey(self.toggle_pause, "space")
 
+        self.screen.onkey(self.next_level, "n")  # Cheat key to go to the next level
+        self.screen.onkey(self.reset_ball, "r")  # Cheat key to reset the ball
+
         self.start_level()
         self.game_loop()
         self.screen.exitonclick()
+
+    def next_level(self):
+        self.scoreboard.increase_level()
+        self.ball.increase_speed()
+        self.start_level()
+        self.ball.reset_position()
+
+    def reset_ball(self):
+        self.ball.reset_position()
 
     def toggle_pause(self):
         self.paused = not self.paused
@@ -59,11 +71,11 @@ class BreakoutGame:
                 # Detect collision with bricks
                 for brick in self.brick_manager.bricks:
                     if self.ball.distance(brick) < 25:
-                        print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), Brick at ({brick.xcor()}, {brick.ycor()})")
-                        self.brick_manager.bricks.remove(brick)
-                        brick.hideturtle()
+                        if brick.hit():
+                            print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), Brick at ({brick.xcor()}, {brick.ycor()})")
+                            self.brick_manager.bricks.remove(brick)
+                            self.scoreboard.increase_score()
                         self.ball.bounce_y()
-                        self.scoreboard.increase_score()
 
                 # Detect if ball misses paddle
                 if self.ball.ycor() < -290:
