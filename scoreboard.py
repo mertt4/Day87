@@ -1,11 +1,13 @@
 from turtle import Turtle
 
+LIVES = 5
+
 
 class Scoreboard(Turtle):
     def __init__(self):
         super().__init__()
         self.score = 0
-        self.lives = 5
+        self.lives = LIVES
         self.level = 1
         self.high_score = self.load_high_score()
         self.color('white')
@@ -55,4 +57,10 @@ class Scoreboard(Turtle):
 
     def clear_paused(self):
         self.clear()
+        self.update_scoreboard()
+
+    def reset(self):
+        self.score = 0
+        self.lives = LIVES
+        self.level = 1
         self.update_scoreboard()

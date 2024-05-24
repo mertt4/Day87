@@ -24,6 +24,7 @@ class BreakoutGame:
         self.screen.onkeypress(self.paddle.go_left, "Left")
         self.screen.onkeypress(self.paddle.go_right, "Right")
         self.screen.onkey(self.toggle_pause, "space")
+        self.screen.onkey(self.restart_game, "Return")
 
         self.screen.onkey(self.next_level, "n")  # Cheat key to go to the next level
         self.screen.onkey(self.reset_ball, "r")  # Cheat key to reset the ball
@@ -50,6 +51,15 @@ class BreakoutGame:
 
     def start_level(self):
         self.brick_manager.create_bricks(self.scoreboard.level)
+
+    def restart_game(self):
+        self.scoreboard.reset()
+        self.paddle.goto(0, -300)
+        self.ball.reset_position()
+        self.start_level()
+        self.game_over = False
+        self.paused = False
+        self.game_loop()
 
     def game_loop(self):
         if not self.game_over:
