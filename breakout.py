@@ -13,6 +13,16 @@ class BreakoutGame:
         self.screen.title("Breakout")
         self.screen.tracer(0)
 
+        # Register custom shapes
+        self.screen.register_shape("paddle.gif")
+        self.screen.register_shape("ball.gif")
+        self.screen.register_shape("brick_red.gif")
+        self.screen.register_shape("brick_orange.gif")
+        self.screen.register_shape("brick_yellow.gif")
+        self.screen.register_shape("brick_green.gif")
+        self.screen.register_shape("brick_blue.gif")
+        self.screen.register_shape("brick_grey.gif")
+
         self.paddle = Paddle((0, -300))
         self.ball = Ball()
         self.brick_manager = BrickManager()
