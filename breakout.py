@@ -13,7 +13,22 @@ class BreakoutGame:
         self.screen.title("Breakout")
         self.screen.tracer(0)
 
-        # Register custom shapes
+        self._register_shapes()
+
+        self.paddle = Paddle((0, -300))
+        self.ball = Ball()
+        self.brick_manager = BrickManager()
+        self.scoreboard = Scoreboard()
+        self.paused = False
+        self.game_over = False  # Initialize game_over flag
+
+        self._setup_controls()
+        self.start_level()
+        self.game_loop()
+        self.screen.exitonclick()
+
+    def _register_shapes(self):
+        """Register custom shapes for game elements"""
         self.screen.register_shape("paddle.gif")
         self.screen.register_shape("ball.gif")
         self.screen.register_shape("brick_red.gif")
@@ -23,13 +38,8 @@ class BreakoutGame:
         self.screen.register_shape("brick_blue.gif")
         self.screen.register_shape("brick_grey.gif")
 
-        self.paddle = Paddle((0, -300))
-        self.ball = Ball()
-        self.brick_manager = BrickManager()
-        self.scoreboard = Scoreboard()
-        self.paused = False
-        self.game_over = False  # Initialize game_over flag
-
+    def _setup_controls(self):
+        """Setup key bindings for game controls"""
         self.screen.listen()
         self.screen.onkeypress(self.paddle.go_left, "Left")
         self.screen.onkeypress(self.paddle.go_right, "Right")
@@ -38,10 +48,6 @@ class BreakoutGame:
 
         self.screen.onkey(self.next_level, "n")  # Cheat key to go to the next level
         self.screen.onkey(self.reset_ball, "r")  # Cheat key to reset the ball
-
-        self.start_level()
-        self.game_loop()
-        self.screen.exitonclick()
 
     def next_level(self):
         self.scoreboard.increase_level()
@@ -62,6 +68,68 @@ class BreakoutGame:
     def start_level(self):
         self.brick_manager.create_bricks(self.scoreboard.level)
 
+    def game_loop(self):
+        if not self.game_over:
+            if not self.paused:
+                self.ball.move()
+                self._check_collisions()
+                self._check_misses()
+                self._check_level_complete()
+
+            self.screen.update()
+            self.screen.ontimer(self.game_loop, 20)
+
+    def _check_collisions(self):
+        """Check and handle collisions between game elements"""
+        self._check_wall_collisions()
+        self._check_paddle_collision()
+        self._check_brick_collisions()
+
+    def _check_wall_collisions(self):
+        """Check and handle collisions with the walls"""
+        if self.ball.xcor() > 290 or self.ball.xcor() < -290:
+            self.ball.bounce_x()
+        if self.ball.ycor() > 290:
+            self.ball.bounce_y()
+
+    def _check_paddle_collision(self):
+        """Check and handle collision with the paddle"""
+        if ((self.paddle.ycor() - 10 < self.ball.ycor() < self.paddle.ycor() + 10) and
+                (self.paddle.xcor() - 55 < self.ball.xcor() < self.paddle.xcor() + 55)):
+            self.ball.sety(self.paddle.ycor() + 10)  # Adjust ball's position to avoid multiple collision detections
+            self.ball.paddle_bounce(self.paddle)
+
+    def _check_brick_collisions(self):
+        """Check and handle collisions with bricks"""
+        for brick in self.brick_manager.bricks:
+            if self.ball.distance(brick) < 25:
+                if brick.hit():
+                    print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), "
+                          f"Brick at ({brick.xcor()}, {brick.ycor()})")
+                    self.brick_manager.bricks.remove(brick)
+                    self.scoreboard.increase_score()
+                self.ball.bounce_y()
+
+    def _check_misses(self):
+        """Check if the ball misses the paddle"""
+        if self.ball.ycor() < -290:
+            print("Ball missed paddle")
+            self.scoreboard.decrease_life()
+            if self.scoreboard.lives == 0:
+                print("Game Over")
+                self.scoreboard.game_over()
+                self.game_over = True
+            else:
+                self.ball.reset_position()
+
+    def _check_level_complete(self):
+        """Check if all bricks are cleared and level is complete"""
+        if not self.brick_manager.bricks:
+            self.scoreboard.increase_level()
+            self.ball.increase_speed()  # Increase ball speed when leveling up
+            self.start_level()
+            self.ball.reset_position()
+
     def restart_game(self):
         self.scoreboard.reset()
         self.paddle.goto(0, -300)
@@ -70,53 +138,6 @@ class BreakoutGame:
         self.game_over = False
         self.paused = False
         self.game_loop()
-
-    def game_loop(self):
-        if not self.game_over:
-            if not self.paused:
-                self.ball.move()
-
-                # Detect collision with walls
-                if self.ball.xcor() > 290 or self.ball.xcor() < -290:
-                    self.ball.bounce_x()
-                if self.ball.ycor() > 290:
-                    self.ball.bounce_y()
-
-                # Detect collision with paddle
-                if ((self.paddle.ycor() - 10 < self.ball.ycor() < self.paddle.ycor() + 10) and
-                        (self.paddle.xcor() - 55 < self.ball.xcor() < self.paddle.xcor() + 55)):
-                    self.ball.sety(self.paddle.ycor() + 10)  # Adjust ball's position to avoid multiple collision detections
-                    self.ball.paddle_bounce(self.paddle)
-
-                # Detect collision with bricks
-                for brick in self.brick_manager.bricks:
-                    if self.ball.distance(brick) < 25:
-                        if brick.hit():
-                            print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), Brick at ({brick.xcor()}, {brick.ycor()})")
-                            self.brick_manager.bricks.remove(brick)
-                            self.scoreboard.increase_score()
-                        self.ball.bounce_y()
-
-                # Detect if ball misses paddle
-                if self.ball.ycor() < -290:
-                    print("Ball missed paddle")
-                    self.scoreboard.decrease_life()
-                    if self.scoreboard.lives == 0:
-                        print("Game Over")
-                        self.scoreboard.game_over()
-                        self.game_over = True
-                    else:
-                        self.ball.reset_position()
-
-                # Check if all bricks are cleared
-                if not self.brick_manager.bricks:
-                    self.scoreboard.increase_level()
-                    self.ball.increase_speed()  # Increase ball speed when leveling up
-                    self.start_level()
-                    self.ball.reset_position()
-
-            self.screen.update()
-            self.screen.ontimer(self.game_loop, 20)
 
 
 if __name__ == "__main__":
