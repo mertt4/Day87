@@ -59,8 +59,21 @@ class Scoreboard(Turtle):
         self.clear()
         self.update_scoreboard()
 
-    def reset(self):
+    def reset_scoreboard(self):
         self.score = 0
         self.lives = LIVES
         self.level = 1
+        self.update_scoreboard()
+
+    def show_start_screen(self):
+        self.goto(0, -20)
+        self.write("Press Enter to Start\n\n"
+                   "Left Arrow: Move Left\n"
+                   "Right Arrow: Move Right\n"
+                   "Space: Pause/Resume\n"
+                   "R: Restart Game",
+                   align="center", font=("Courier", 14, 'normal'))
+
+    def clear_start_screen(self):
+        self.clear()
         self.update_scoreboard()

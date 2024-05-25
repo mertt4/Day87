@@ -21,10 +21,11 @@ class BreakoutGame:
         self.scoreboard = Scoreboard()
         self.paused = False
         self.game_over = False  # Initialize game_over flag
+        self.game_started = False  # Flag to check if the game has started
 
         self._setup_controls()
+        self.show_start_screen()
         self.start_level()
-        self.game_loop()
         self.screen.exitonclick()
 
     def _register_shapes(self):
@@ -44,10 +45,21 @@ class BreakoutGame:
         self.screen.onkeypress(self.paddle.go_left, "Left")
         self.screen.onkeypress(self.paddle.go_right, "Right")
         self.screen.onkey(self.toggle_pause, "space")
-        self.screen.onkey(self.restart_game, "Return")
+        self.screen.onkey(self.start_game, "Return")
+        self.screen.onkey(self.restart_game, "r")
 
         self.screen.onkey(self.next_level, "n")  # Cheat key to go to the next level
-        self.screen.onkey(self.reset_ball, "r")  # Cheat key to reset the ball
+        self.screen.onkey(self.reset_ball, "b")  # Cheat key to reset the ball
+
+    def show_start_screen(self):
+        self.scoreboard.show_start_screen()
+
+    def start_game(self):
+        if not self.game_started:
+            self.scoreboard.clear_start_screen()
+            self.game_started = True
+            self.start_level()
+            self.game_loop()
 
     def next_level(self):
         self.scoreboard.increase_level()
@@ -59,18 +71,19 @@ class BreakoutGame:
         self.ball.reset_position()
 
     def toggle_pause(self):
-        self.paused = not self.paused
-        if self.paused:
-            self.scoreboard.show_paused()
-        else:
-            self.scoreboard.clear_paused()
+        if self.game_started and not self.game_over:
+            self.paused = not self.paused
+            if self.paused:
+                self.scoreboard.show_paused()
+            else:
+                self.scoreboard.clear_paused()
 
     def start_level(self):
         self.brick_manager.create_bricks(self.scoreboard.level)
 
     def game_loop(self):
         if not self.game_over:
-            if not self.paused:
+            if self.game_started and not self.paused:
                 self.ball.move()
                 self._check_collisions()
                 self._check_misses()
@@ -131,13 +144,14 @@ class BreakoutGame:
             self.ball.reset_position()
 
     def restart_game(self):
-        self.scoreboard.reset()
+        self.scoreboard.reset_scoreboard()
         self.paddle.goto(0, -300)
         self.ball.reset_position()
         self.start_level()
         self.game_over = False
         self.paused = False
-        self.game_loop()
+        self.game_started = False
+        self.show_start_screen()
 
 
 if __name__ == "__main__":
