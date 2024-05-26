@@ -35,3 +35,6 @@ class Ball(Turtle):
 
     def increase_speed(self):
         self.move_speed *= 0.9  # Increase speed by 10%
+
+    def decrease_speed(self):
+        self.move_speed /= 0.9  # Decrease speed by 10%

@@ -1,10 +1,13 @@
+import random
 from turtle import Turtle
 from brick import Brick
+from powerup import PowerUp
 
 
 class BrickManager:
     def __init__(self):
         self.bricks = []
+        self.active_powerups = []  # Track active power-ups
 
     def create_bricks(self, level):
         self.clear_bricks()
@@ -31,6 +34,21 @@ class BrickManager:
                     color = colors[row]
                     brick = Brick(position=(x_position, y_position), hits=hits, color=color)
                     self.bricks.append(brick)
+
+    def check_for_powerup(self, brick_position):
+        if random.random() < 0.9:  # 90% chance to spawn a power-up
+            powerup_type = random.choice(["expand_paddle", "shrink_paddle", "extra_life", "increase_speed",
+                                          "decrease_speed", "multi_ball"])
+            print(f"Spawning power-up: {powerup_type} at {brick_position}")
+            return PowerUp(powerup_type, brick_position)
+        return None
+
+    def remove_brick(self, brick):
+        self.bricks.remove(brick)
+        powerup = self.check_for_powerup(brick.position())
+        if powerup:
+            print(f"Power-up Created: {powerup.powerup_type} at ({powerup.xcor()}, {powerup.ycor()}")
+            self.active_powerups.append(powerup)
 
     def clear_bricks(self):
         for brick in self.bricks:

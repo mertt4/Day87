@@ -88,6 +88,8 @@ class BreakoutGame:
                 self._check_collisions()
                 self._check_misses()
                 self._check_level_complete()
+                self._move_powerups()
+                self._check_powerup_collisions()
 
             self.screen.update()
             self.screen.ontimer(self.game_loop, 20)
@@ -117,9 +119,9 @@ class BreakoutGame:
         for brick in self.brick_manager.bricks:
             if self.ball.distance(brick) < 25:
                 if brick.hit():
-                    print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), "
-                          f"Brick at ({brick.xcor()}, {brick.ycor()})")
-                    self.brick_manager.bricks.remove(brick)
+                    # print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), "
+                    #       f"Brick at ({brick.xcor()}, {brick.ycor()})")
+                    self.brick_manager.remove_brick(brick)
                     self.scoreboard.increase_score()
                 self.ball.bounce_y()
 
@@ -142,6 +144,22 @@ class BreakoutGame:
             self.ball.increase_speed()  # Increase ball speed when leveling up
             self.start_level()
             self.ball.reset_position()
+
+    def _move_powerups(self):
+        for powerup in self.brick_manager.active_powerups:
+            powerup.move()
+            if powerup.ycor() < -320:
+                self.brick_manager.active_powerups.remove(powerup)
+                powerup.hideturtle()
+                print("Power-up missed and removed")
+
+    def _check_powerup_collisions(self):
+        for powerup in self.brick_manager.active_powerups:
+            if self.paddle.distance(powerup) < 50:
+                print(f"Power-up collected: {powerup.powerup_type}")
+                powerup.apply_effect(self)
+                self.brick_manager.active_powerups.remove(powerup)
+                powerup.hideturtle()
 
     def restart_game(self):
         self.scoreboard.reset_scoreboard()
