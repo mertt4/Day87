@@ -30,14 +30,14 @@ class BreakoutGame:
 
     def _register_shapes(self):
         """Register custom shapes for game elements"""
-        self.screen.register_shape("paddle.gif")
-        self.screen.register_shape("ball.gif")
-        self.screen.register_shape("brick_red.gif")
-        self.screen.register_shape("brick_orange.gif")
-        self.screen.register_shape("brick_yellow.gif")
-        self.screen.register_shape("brick_green.gif")
-        self.screen.register_shape("brick_blue.gif")
-        self.screen.register_shape("brick_grey.gif")
+        self.screen.register_shape("artwork/paddle.gif")
+        self.screen.register_shape("artwork/ball.gif")
+        self.screen.register_shape("artwork/brick_red.gif")
+        self.screen.register_shape("artwork/brick_orange.gif")
+        self.screen.register_shape("artwork/brick_yellow.gif")
+        self.screen.register_shape("artwork/brick_green.gif")
+        self.screen.register_shape("artwork/brick_blue.gif")
+        self.screen.register_shape("artwork/brick_grey.gif")
 
     def _setup_controls(self):
         """Setup key bindings for game controls"""

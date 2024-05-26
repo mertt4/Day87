@@ -4,7 +4,7 @@ from turtle import Turtle
 class Paddle(Turtle):
     def __init__(self, position):
         super().__init__()
-        self.shape("paddle.gif")
+        self.shape("artwork/paddle.gif")
         self.penup()
         self.goto(position)
 
