@@ -106,34 +106,34 @@ class BreakoutGame:
 
     def _check_collisions(self, ball):
         """Check and handle collisions between game elements"""
-        self._check_wall_collisions()
-        self._check_paddle_collision()
-        self._check_brick_collisions()
+        self._check_wall_collisions(ball)
+        self._check_paddle_collision(ball)
+        self._check_brick_collisions(ball)
 
-    def _check_wall_collisions(self):
+    def _check_wall_collisions(self, ball):
         """Check and handle collisions with the walls"""
-        if self.ball.xcor() > 290 or self.ball.xcor() < -290:
-            self.ball.bounce_x()
-        if self.ball.ycor() > 290:
-            self.ball.bounce_y()
+        if ball.xcor() > 290 or ball.xcor() < -290:
+            ball.bounce_x()
+        if ball.ycor() > 290:
+            ball.bounce_y()
 
-    def _check_paddle_collision(self):
+    def _check_paddle_collision(self, ball):
         """Check and handle collision with the paddle"""
-        if ((self.paddle.ycor() - 10 < self.ball.ycor() < self.paddle.ycor() + 10) and
-                (self.paddle.xcor() - 55 < self.ball.xcor() < self.paddle.xcor() + 55)):
-            self.ball.sety(self.paddle.ycor() + 10)  # Adjust ball's position to avoid multiple collision detections
-            self.ball.paddle_bounce(self.paddle)
+        if ((self.paddle.ycor() - 10 < ball.ycor() < self.paddle.ycor() + 10) and
+                (self.paddle.xcor() - ((self.paddle.width / 2) + 5) < ball.xcor() <
+                 self.paddle.xcor() + ((self.paddle.width / 2) + 5))):
+            ball.sety(self.paddle.ycor() + 10)  # Adjust ball's position to avoid multiple collision detections
+            ball.paddle_bounce(self.paddle)
 
-    def _check_brick_collisions(self):
+    def _check_brick_collisions(self, ball):
         """Check and handle collisions with bricks"""
         for brick in self.brick_manager.bricks:
-            if self.ball.distance(brick) < 25:
+            if ball.distance(brick) < 25:
                 if brick.hit():
-                    # print(f"Brick collision detected: Ball at ({self.ball.xcor()}, {self.ball.ycor()}), "
-                    #       f"Brick at ({brick.xcor()}, {brick.ycor()})")
                     self.brick_manager.remove_brick(brick)
                     self.scoreboard.increase_score()
-                self.ball.bounce_y()
+                ball.bounce_y()
+                break
 
     def _check_misses(self, ball):
         """Check if the ball misses the paddle"""
@@ -145,7 +145,7 @@ class BreakoutGame:
                 self.scoreboard.game_over()
                 self.game_over = True
             else:
-                self.ball.reset_position()
+                ball.reset_position()
 
     def _check_level_complete(self):
         """Check if all bricks are cleared and level is complete"""
