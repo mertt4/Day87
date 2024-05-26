@@ -22,6 +22,7 @@ class BreakoutGame:
         self.paused = False
         self.game_over = False  # Initialize game_over flag
         self.game_started = False  # Flag to check if the game has started
+        self.balls = [self.ball]
 
         self._setup_controls()
         self.show_start_screen()
@@ -38,6 +39,14 @@ class BreakoutGame:
         self.screen.register_shape("artwork/brick_green.gif")
         self.screen.register_shape("artwork/brick_blue.gif")
         self.screen.register_shape("artwork/brick_grey.gif")
+        self.screen.register_shape("artwork/extra_life.gif")
+        self.screen.register_shape("artwork/increase_speed.gif")
+        self.screen.register_shape("artwork/decrease_speed.gif")
+        self.screen.register_shape("artwork/expand_paddle.gif")
+        self.screen.register_shape("artwork/shrink_paddle.gif")
+        self.screen.register_shape("artwork/multi_ball.gif")
+        self.screen.register_shape("artwork/paddle_long.gif")
+        self.screen.register_shape("artwork/paddle_short.gif")
 
     def _setup_controls(self):
         """Setup key bindings for game controls"""
@@ -84,9 +93,10 @@ class BreakoutGame:
     def game_loop(self):
         if not self.game_over:
             if self.game_started and not self.paused:
-                self.ball.move()
-                self._check_collisions()
-                self._check_misses()
+                for ball in self.balls:
+                    ball.move()
+                    self._check_collisions(ball)
+                    self._check_misses(ball)
                 self._check_level_complete()
                 self._move_powerups()
                 self._check_powerup_collisions()
@@ -94,7 +104,7 @@ class BreakoutGame:
             self.screen.update()
             self.screen.ontimer(self.game_loop, 20)
 
-    def _check_collisions(self):
+    def _check_collisions(self, ball):
         """Check and handle collisions between game elements"""
         self._check_wall_collisions()
         self._check_paddle_collision()
@@ -125,9 +135,9 @@ class BreakoutGame:
                     self.scoreboard.increase_score()
                 self.ball.bounce_y()
 
-    def _check_misses(self):
+    def _check_misses(self, ball):
         """Check if the ball misses the paddle"""
-        if self.ball.ycor() < -290:
+        if ball.ycor() < -290:
             print("Ball missed paddle")
             self.scoreboard.decrease_life()
             if self.scoreboard.lives == 0:
