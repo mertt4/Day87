@@ -1,7 +1,8 @@
 import random
-from turtle import Turtle
 from brick import Brick
 from powerup import PowerUp
+
+CHANCE = 0.08
 
 
 class BrickManager:
@@ -36,7 +37,7 @@ class BrickManager:
                     self.bricks.append(brick)
 
     def check_for_powerup(self, brick_position):
-        if random.random() < 0.9:  # 90% chance to spawn a power-up
+        if random.random() < CHANCE:  # chance to spawn a power-up
             powerup_type = random.choice(["expand_paddle", "shrink_paddle", "extra_life", "increase_speed",
                                           "decrease_speed", "multi_ball"])
             print(f"Spawning power-up: {powerup_type} at {brick_position}")

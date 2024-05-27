@@ -7,9 +7,12 @@ class Ball(Turtle):
         self.shape("artwork/ball.gif")
         # self.color("white")
         self.penup()
+        self.speed(0)  # Fastest animation speed
+        self.initial_speed = 0.1  # Initial move speed (delay between movements)
+        self.min_speed = 0.02  # Minimum move speed (to prevent too fast movement)
+        self.move_speed = self.initial_speed
         self.x_move = 10
         self.y_move = 10
-        self.move_speed = 0.1
 
     def move(self):
         new_x = self.xcor() + self.x_move
@@ -30,7 +33,6 @@ class Ball(Turtle):
 
     def reset_position(self):
         self.goto(0, 0)
-        self.move_speed = 0.1
         self.bounce_y()
 
     def increase_speed(self):
@@ -38,3 +40,6 @@ class Ball(Turtle):
 
     def decrease_speed(self):
         self.move_speed /= 0.9  # Decrease speed by 10%
+
+    def reset_speed(self):
+        self.move_speed = self.initial_speed

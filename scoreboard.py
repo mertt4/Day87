@@ -71,7 +71,8 @@ class Scoreboard(Turtle):
                    "Left Arrow: Move Left\n"
                    "Right Arrow: Move Right\n"
                    "Space: Pause/Resume\n"
-                   "R: Restart Game",
+                   "R: Restart Game\n\n"
+                   "Click to quit",
                    align="center", font=("Courier", 14, 'normal'))
 
     def clear_start_screen(self):

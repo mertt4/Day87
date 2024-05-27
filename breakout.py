@@ -24,6 +24,8 @@ class BreakoutGame:
         self.game_started = False  # Flag to check if the game has started
         self.balls = [self.ball]
 
+        self.game_loop_active = False  # Flag to manage game loop timer
+
         self._setup_controls()
         self.show_start_screen()
         self.start_level()
@@ -68,11 +70,12 @@ class BreakoutGame:
             self.scoreboard.clear_start_screen()
             self.game_started = True
             self.start_level()
-            self.game_loop()
+            self.start_game_loop()
 
     def next_level(self):
         self.scoreboard.increase_level()
-        self.ball.increase_speed()
+        for ball in self.balls:
+            ball.increase_speed()
         self.start_level()
         self.ball.reset_position()
 
@@ -90,19 +93,29 @@ class BreakoutGame:
     def start_level(self):
         self.brick_manager.create_bricks(self.scoreboard.level)
 
-    def game_loop(self):
-        if not self.game_over:
-            if self.game_started and not self.paused:
-                for ball in self.balls:
-                    ball.move()
-                    self._check_collisions(ball)
-                    self._check_misses(ball)
-                self._check_level_complete()
-                self._move_powerups()
-                self._check_powerup_collisions()
-
-            self.screen.update()
+    def start_game_loop(self):
+        if not self.game_loop_active:
+            self.game_loop_active = True
             self.screen.ontimer(self.game_loop, 20)
+
+    def game_loop(self):
+        if self.game_loop_active:
+            if not self.game_over:
+                if self.game_started and not self.paused:
+                    for ball in self.balls:
+                        ball.move()
+                        self._check_collisions(ball)
+                        self._check_misses(ball)
+                    self._check_level_complete()
+                    self._move_powerups()
+                    self._check_powerup_collisions()
+                self.screen.update()
+            self.screen.ontimer(self.game_loop, 20)
+        # else:
+        #     self.screen.ontimer(self.start_game_loop, 20)
+
+    def stop_game_loop(self):
+        self.game_loop_active = False
 
     def _check_collisions(self, ball):
         """Check and handle collisions between game elements"""
@@ -151,7 +164,8 @@ class BreakoutGame:
         """Check if all bricks are cleared and level is complete"""
         if not self.brick_manager.bricks:
             self.scoreboard.increase_level()
-            self.ball.increase_speed()  # Increase ball speed when leveling up
+            for ball in self.balls:
+                ball.increase_speed()
             self.start_level()
             self.ball.reset_position()
 
@@ -172,9 +186,17 @@ class BreakoutGame:
                 powerup.hideturtle()
 
     def restart_game(self):
+        self.stop_game_loop()
         self.scoreboard.reset_scoreboard()
         self.paddle.goto(0, -300)
-        self.ball.reset_position()
+        # Hide and clear all existing balls
+        for ball in self.balls:
+            ball.hideturtle()
+        self.balls.clear()
+        # Create a new ball and add it to the balls list
+        self.ball = Ball()
+        self.ball.reset_speed()
+        self.balls.append(self.ball)
         self.start_level()
         self.game_over = False
         self.paused = False
