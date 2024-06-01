@@ -14,21 +14,20 @@ class BreakoutGame:
         self.screen.tracer(0)
 
         self._register_shapes()
-
         self.paddle = Paddle((0, -300))
-        self.ball = Ball()
         self.brick_manager = BrickManager()
         self.scoreboard = Scoreboard()
         self.paused = False
         self.game_over = False  # Initialize game_over flag
         self.game_started = False  # Flag to check if the game has started
-        self.balls = [self.ball]
-
-        self.game_loop_active = False  # Flag to manage game loop timer
+        self.balls = []  # List to keep track of all balls
+        self.timer_id = None
 
         self._setup_controls()
         self.show_start_screen()
         self.start_level()
+        self.add_new_ball()
+        self.start_game_loop()
         self.screen.exitonclick()
 
     def _register_shapes(self):
@@ -77,10 +76,10 @@ class BreakoutGame:
         for ball in self.balls:
             ball.increase_speed()
         self.start_level()
-        self.ball.reset_position()
+        self.reset_all_balls()
 
     def reset_ball(self):
-        self.ball.reset_position()
+        self.reset_all_balls()
 
     def toggle_pause(self):
         if self.game_started and not self.game_over:
@@ -94,28 +93,43 @@ class BreakoutGame:
         self.brick_manager.create_bricks(self.scoreboard.level)
 
     def start_game_loop(self):
-        if not self.game_loop_active:
-            self.game_loop_active = True
-            self.screen.ontimer(self.game_loop, 20)
+        if self.timer_id is None:
+            self.timer_id = self.screen.ontimer(self.game_loop, 20)
 
     def game_loop(self):
-        if self.game_loop_active:
-            if not self.game_over:
-                if self.game_started and not self.paused:
-                    for ball in self.balls:
-                        ball.move()
-                        self._check_collisions(ball)
-                        self._check_misses(ball)
-                    self._check_level_complete()
-                    self._move_powerups()
-                    self._check_powerup_collisions()
-                self.screen.update()
-            self.screen.ontimer(self.game_loop, 20)
-        # else:
-        #     self.screen.ontimer(self.start_game_loop, 20)
+        if not self.game_over:
+            if self.game_started and not self.paused:
+                for ball in self.balls:
+                    ball.move()
+                    self._check_collisions(ball)
+                    self._check_misses(ball)
+                self._check_level_complete()
+                self._move_powerups()
+                self._check_powerup_collisions()
+            self.screen.update()
+            self.timer_id = self.screen.ontimer(self.game_loop, 20)
 
     def stop_game_loop(self):
-        self.game_loop_active = False
+        if self.timer_id is not None:
+            self.screen.ontimer(None, self.timer_id)  # Cancel the existing timer
+            self.timer_id = None
+
+    def clear_all_balls(self):
+        """Hide and clear all existing balls"""
+        for ball in self.balls:
+            ball.hideturtle()
+        self.balls.clear()
+
+    def add_new_ball(self):
+        """Create and add a new ball to the balls list"""
+        ball = Ball()
+        ball.reset_speed()
+        self.balls.append(ball)
+
+    def reset_all_balls(self):
+        """Reset the position and speed of all balls"""
+        self.clear_all_balls()
+        self.add_new_ball()
 
     def _check_collisions(self, ball):
         """Check and handle collisions between game elements"""
@@ -125,7 +139,7 @@ class BreakoutGame:
 
     def _check_wall_collisions(self, ball):
         """Check and handle collisions with the walls"""
-        if ball.xcor() > 290 or ball.xcor() < -290:
+        if ball.xcor() > 285 or ball.xcor() < -285:
             ball.bounce_x()
         if ball.ycor() > 290:
             ball.bounce_y()
@@ -151,14 +165,15 @@ class BreakoutGame:
     def _check_misses(self, ball):
         """Check if the ball misses the paddle"""
         if ball.ycor() < -290:
-            print("Ball missed paddle")
-            self.scoreboard.decrease_life()
-            if self.scoreboard.lives == 0:
-                print("Game Over")
-                self.scoreboard.game_over()
-                self.game_over = True
-            else:
-                ball.reset_position()
+            self.balls.remove(ball)
+            ball.hideturtle()
+            if not self.balls:  # Check if there are no balls left
+                self.scoreboard.decrease_life()
+                if self.scoreboard.lives == 0:
+                    self.scoreboard.game_over()
+                    self.game_over = True
+                else:
+                    self.reset_all_balls()
 
     def _check_level_complete(self):
         """Check if all bricks are cleared and level is complete"""
@@ -167,7 +182,7 @@ class BreakoutGame:
             for ball in self.balls:
                 ball.increase_speed()
             self.start_level()
-            self.ball.reset_position()
+            self.reset_all_balls()
 
     def _move_powerups(self):
         for powerup in self.brick_manager.active_powerups:
@@ -189,19 +204,14 @@ class BreakoutGame:
         self.stop_game_loop()
         self.scoreboard.reset_scoreboard()
         self.paddle.goto(0, -300)
-        # Hide and clear all existing balls
-        for ball in self.balls:
-            ball.hideturtle()
-        self.balls.clear()
-        # Create a new ball and add it to the balls list
-        self.ball = Ball()
-        self.ball.reset_speed()
-        self.balls.append(self.ball)
+        self.clear_all_balls()
+        self.add_new_ball()
         self.start_level()
         self.game_over = False
         self.paused = False
         self.game_started = False
         self.show_start_screen()
+        self.start_game_loop()
 
 
 if __name__ == "__main__":

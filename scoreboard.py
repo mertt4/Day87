@@ -66,7 +66,7 @@ class Scoreboard(Turtle):
         self.update_scoreboard()
 
     def show_start_screen(self):
-        self.goto(0, -20)
+        self.goto(0, -60)
         self.write("Press Enter to Start\n\n"
                    "Left Arrow: Move Left\n"
                    "Right Arrow: Move Right\n"

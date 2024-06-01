@@ -10,9 +10,10 @@ class Ball(Turtle):
         self.speed(0)  # Fastest animation speed
         self.initial_speed = 0.1  # Initial move speed (delay between movements)
         self.min_speed = 0.02  # Minimum move speed (to prevent too fast movement)
+        self.max_speed = 0.9  # Maximum move speed
         self.move_speed = self.initial_speed
-        self.x_move = 10
-        self.y_move = 10
+        self.x_move = 5
+        self.y_move = 5
 
     def move(self):
         new_x = self.xcor() + self.x_move
@@ -36,10 +37,15 @@ class Ball(Turtle):
         self.bounce_y()
 
     def increase_speed(self):
-        self.move_speed *= 0.9  # Increase speed by 10%
+        new_speed = self.move_speed * 0.9  # Reduce delay (increase speed)
+        self.move_speed = max(new_speed, self.min_speed)  # Cap at min_speed
+        print(f"Increased speed, new move_speed: {self.move_speed}")
 
     def decrease_speed(self):
-        self.move_speed /= 0.9  # Decrease speed by 10%
+        new_speed = self.move_speed / 0.9  # Increase delay (decrease speed)
+        self.move_speed = min(new_speed, self.max_speed)  # Cap at max_speed
+        print(f"Decreased speed, new move_speed: {self.move_speed}")
 
     def reset_speed(self):
         self.move_speed = self.initial_speed
+        print(f"Reset speed, new move_speed: {self.move_speed}")

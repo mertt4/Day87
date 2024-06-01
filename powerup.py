@@ -28,7 +28,7 @@ class PowerUp(Turtle):
             self.shape("artwork/multi_ball.gif")
 
     def move(self):
-        self.forward(10)
+        self.forward(5)
 
     def apply_effect(self, game):
         if self.powerup_type == "expand_paddle":
@@ -39,9 +39,9 @@ class PowerUp(Turtle):
             game.scoreboard.lives += 1
             game.scoreboard.update_scoreboard()
         elif self.powerup_type == "increase_speed":
-            game.ball.increase_speed()
+            game.balls.increase_speed()
         elif self.powerup_type == "decrease_speed":
-            game.ball.decrease_speed()
+            game.balls.decrease_speed()
         elif self.powerup_type == "multi_ball":
             self.multi_ball(game)
 
@@ -56,10 +56,12 @@ class PowerUp(Turtle):
         self.hideturtle()
 
     def multi_ball(self, game):
-        # Create additional balls and add them to the game
-        for _ in range(2):  # add two more balls
-            new_ball = Ball()
-            new_ball.goto(game.ball.position())
-            new_ball.setheading(random.randint(0, 360))  # set a random direction for the new ball
-            game.balls.append(new_ball)
-        self.hideturtle()
+        existing_balls = game.balls.copy()
+        for ball in existing_balls:
+            for _ in range(2):  # Create two new balls for each existing ball
+                new_ball = Ball()
+                new_ball.goto(ball.xcor(), ball.ycor())
+                new_ball.x_move = ball.x_move
+                new_ball.y_move = -ball.y_move  # reverse the y for some variation
+                new_ball.move_speed = ball.move_speed
+                game.balls.append(new_ball)
