@@ -39,9 +39,11 @@ class PowerUp(Turtle):
             game.scoreboard.lives += 1
             game.scoreboard.update_scoreboard()
         elif self.powerup_type == "increase_speed":
-            game.balls.increase_speed()
+            for ball in game.balls:
+                ball.increase_speed()
         elif self.powerup_type == "decrease_speed":
-            game.balls.decrease_speed()
+            for ball in game.balls:
+                ball.decrease_speed()
         elif self.powerup_type == "multi_ball":
             self.multi_ball(game)
 

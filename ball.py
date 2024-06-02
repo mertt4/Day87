@@ -8,12 +8,12 @@ class Ball(Turtle):
         # self.color("white")
         self.penup()
         self.speed(0)  # Fastest animation speed
-        self.initial_speed = 0.1  # Initial move speed (delay between movements)
-        self.min_speed = 0.02  # Minimum move speed (to prevent too fast movement)
-        self.max_speed = 0.9  # Maximum move speed
+        self.initial_speed = 0.08  # Initial move speed (delay between movements)
+        self.min_speed = 0.01  # Minimum move speed (to prevent too fast movement)
+        self.max_speed = 0.3  # Maximum move speed
         self.move_speed = self.initial_speed
-        self.x_move = 5
-        self.y_move = 5
+        self.x_move = 10
+        self.y_move = 10
 
     def move(self):
         new_x = self.xcor() + self.x_move

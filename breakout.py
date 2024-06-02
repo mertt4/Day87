@@ -88,6 +88,7 @@ class BreakoutGame:
                 self.scoreboard.show_paused()
             else:
                 self.scoreboard.clear_paused()
+                self.start_game_loop()
 
     def start_level(self):
         self.brick_manager.create_bricks(self.scoreboard.level)
@@ -106,8 +107,8 @@ class BreakoutGame:
                 self._check_level_complete()
                 self._move_powerups()
                 self._check_powerup_collisions()
-            self.screen.update()
-            self.timer_id = self.screen.ontimer(self.game_loop, 20)
+                self.screen.update()
+                self.timer_id = self.screen.ontimer(self.game_loop, 20)
 
     def stop_game_loop(self):
         if self.timer_id is not None:
